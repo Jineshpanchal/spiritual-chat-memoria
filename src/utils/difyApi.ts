@@ -1,11 +1,9 @@
 
 import { DifyResponse, Message } from "@/types/chat";
 import { toast } from "sonner";
-
-const API_URL = "https://api.dify.ai/v1/chat-messages";
+import { DIFY_CONFIG } from "./config";
 
 export interface DifyApiConfig {
-  apiKey: string;
   conversationId?: string;
   userContext?: Record<string, any>;
 }
@@ -15,24 +13,28 @@ export async function sendMessageToDify(
   config: DifyApiConfig
 ): Promise<DifyResponse> {
   try {
-    const { apiKey, conversationId, userContext } = config;
+    const { conversationId, userContext } = config;
     
-    const response = await fetch(API_URL, {
+    console.log("Sending message to Dify API", { message, conversationId });
+    
+    const response = await fetch(DIFY_CONFIG.API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${DIFY_CONFIG.API_KEY}`,
       },
       body: JSON.stringify({
         inputs: userContext || {},
         query: message,
         response_mode: "blocking",
         conversation_id: conversationId,
-        user: "user-id", // You might want to generate a unique ID for users
+        user: "public-user", // Generic user ID for public access
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Dify API error:", errorText);
       throw new Error(`Error connecting to Dify API: ${response.statusText}`);
     }
 

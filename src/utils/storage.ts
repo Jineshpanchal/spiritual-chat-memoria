@@ -1,15 +1,11 @@
 
 import { ChatHistory, Message, UserContext } from "@/types/chat";
-
-const CHATS_STORAGE_KEY = "spiritual_chat_histories";
-const CURRENT_CHAT_KEY = "spiritual_current_chat";
-const USER_CONTEXT_KEY = "spiritual_user_context";
-const API_KEY_STORAGE_KEY = "spiritual_dify_api_key";
+import { STORAGE_KEYS } from "./config";
 
 // Chat History Storage
 export function saveChats(chats: ChatHistory[]): void {
   try {
-    localStorage.setItem(CHATS_STORAGE_KEY, JSON.stringify(chats));
+    localStorage.setItem(STORAGE_KEYS.CHATS, JSON.stringify(chats));
   } catch (error) {
     console.error("Error saving chats to localStorage:", error);
   }
@@ -17,7 +13,7 @@ export function saveChats(chats: ChatHistory[]): void {
 
 export function getChats(): ChatHistory[] {
   try {
-    const storedChats = localStorage.getItem(CHATS_STORAGE_KEY);
+    const storedChats = localStorage.getItem(STORAGE_KEYS.CHATS);
     return storedChats ? JSON.parse(storedChats) : [];
   } catch (error) {
     console.error("Error getting chats from localStorage:", error);
@@ -27,7 +23,7 @@ export function getChats(): ChatHistory[] {
 
 export function saveCurrentChatId(chatId: string): void {
   try {
-    localStorage.setItem(CURRENT_CHAT_KEY, chatId);
+    localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT, chatId);
   } catch (error) {
     console.error("Error saving current chat ID to localStorage:", error);
   }
@@ -35,7 +31,7 @@ export function saveCurrentChatId(chatId: string): void {
 
 export function getCurrentChatId(): string | null {
   try {
-    return localStorage.getItem(CURRENT_CHAT_KEY);
+    return localStorage.getItem(STORAGE_KEYS.CURRENT_CHAT);
   } catch (error) {
     console.error("Error getting current chat ID from localStorage:", error);
     return null;
@@ -45,7 +41,7 @@ export function getCurrentChatId(): string | null {
 // User Context Storage
 export function saveUserContext(context: UserContext): void {
   try {
-    localStorage.setItem(USER_CONTEXT_KEY, JSON.stringify(context));
+    localStorage.setItem(STORAGE_KEYS.USER_CONTEXT, JSON.stringify(context));
   } catch (error) {
     console.error("Error saving user context to localStorage:", error);
   }
@@ -53,7 +49,7 @@ export function saveUserContext(context: UserContext): void {
 
 export function getUserContext(): UserContext {
   try {
-    const storedContext = localStorage.getItem(USER_CONTEXT_KEY);
+    const storedContext = localStorage.getItem(STORAGE_KEYS.USER_CONTEXT);
     return storedContext ? JSON.parse(storedContext) : {};
   } catch (error) {
     console.error("Error getting user context from localStorage:", error);
@@ -66,22 +62,4 @@ export function updateUserContext(updates: Partial<UserContext>): UserContext {
   const updatedContext = { ...currentContext, ...updates };
   saveUserContext(updatedContext);
   return updatedContext;
-}
-
-// API Key Storage
-export function saveDifyApiKey(apiKey: string): void {
-  try {
-    localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-  } catch (error) {
-    console.error("Error saving API key to localStorage:", error);
-  }
-}
-
-export function getDifyApiKey(): string | null {
-  try {
-    return localStorage.getItem(API_KEY_STORAGE_KEY);
-  } catch (error) {
-    console.error("Error getting API key from localStorage:", error);
-    return null;
-  }
 }

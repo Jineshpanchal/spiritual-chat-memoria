@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import ChatHeader from "@/components/ChatHeader";
-import ApiKeyDialog from "@/components/ApiKeyDialog";
 import EmptyState from "@/components/EmptyState";
+import SuggestedQuestions from "@/components/SuggestedQuestions";
 import { ChatHistory, Message } from "@/types/chat";
 import { toast } from "sonner";
 import {
@@ -12,7 +12,6 @@ import {
   saveChats,
   getCurrentChatId,
   saveCurrentChatId,
-  getDifyApiKey,
   getUserContext,
   updateUserContext,
 } from "@/utils/storage";
@@ -24,32 +23,24 @@ import {
 } from "@/utils/chatUtils";
 import { sendMessageToDify } from "@/utils/difyApi";
 import ChatHistorySidebar from "@/components/ChatHistorySidebar";
+import { DIFY_CONFIG } from "@/utils/config";
 
 const Index = () => {
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [isApiDialogOpen, setIsApiDialogOpen] = useState(false);
   const [userContext, setUserContext] = useState({});
 
   // Initialize from localStorage
   useEffect(() => {
     const storedChats = getChats();
     const storedCurrentChatId = getCurrentChatId();
-    const storedApiKey = getDifyApiKey();
     const storedUserContext = getUserContext();
 
     setChatHistories(storedChats);
     setCurrentChatId(storedCurrentChatId);
-    setApiKey(storedApiKey);
     setUserContext(storedUserContext);
-
-    // If no API key is set, show the dialog
-    if (!storedApiKey) {
-      setIsApiDialogOpen(true);
-    }
   }, []);
 
   // Get current chat
@@ -93,13 +84,13 @@ const Index = () => {
     }
   };
 
+  // Handle suggested question selection
+  const handleSuggestedQuestion = (question: string) => {
+    handleSendMessage(question);
+  };
+
   // Send a message
   const handleSendMessage = async (content: string) => {
-    if (!apiKey) {
-      setIsApiDialogOpen(true);
-      return;
-    }
-
     // Create or get the current chat
     let chat: ChatHistory;
     if (!currentChatId || !currentChat) {
@@ -147,7 +138,6 @@ const Index = () => {
     setIsLoading(true);
     try {
       const response = await sendMessageToDify(content, {
-        apiKey,
         conversationId: chat.id,
         userContext: { ...userContext, ...newContextData },
       });
@@ -185,36 +175,35 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 to-blue-50">
       <div className="container max-w-4xl flex-1 py-4 flex flex-col">
         <ChatHeader
           currentChat={currentChat}
           onNewChat={handleNewChat}
-          onOpenSettings={() => setIsApiDialogOpen(true)}
-          hasApiKey={!!apiKey}
         />
 
         <div className="flex-1 my-4 overflow-hidden flex flex-col">
           {!currentChat ? (
-            <EmptyState
-              hasApiKey={!!apiKey}
-              onNewChat={handleNewChat}
-              onSetupApi={() => setIsApiDialogOpen(true)}
-            />
+            <EmptyState onNewChat={handleNewChat} />
           ) : (
             <>
               <div className="flex-1 overflow-y-auto p-4 scrollbar-thin rounded-2xl bg-chat-gradient spiritual-shadow">
                 {currentChat.messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                    <p className="text-muted-foreground max-w-md">
+                    <p className="text-muted-foreground max-w-md mb-8">
                       Start your spiritual journey by sending a message.
                     </p>
+                    <SuggestedQuestions onSelect={handleSuggestedQuestion} />
                   </div>
                 ) : (
                   <>
                     {currentChat.messages.map((message) => (
                       <ChatMessage key={message.id} message={message} />
                     ))}
+                    {currentChat.messages.length > 0 && 
+                     currentChat.messages[currentChat.messages.length - 1].role === "assistant" && (
+                      <SuggestedQuestions onSelect={handleSuggestedQuestion} />
+                    )}
                     <div ref={messagesEndRef} />
                   </>
                 )}
@@ -235,12 +224,6 @@ const Index = () => {
         currentChatId={currentChatId}
         onSelectChat={handleSelectChat}
         onDeleteChat={handleDeleteChat}
-      />
-      
-      <ApiKeyDialog
-        isOpen={isApiDialogOpen}
-        onClose={() => setIsApiDialogOpen(false)}
-        currentApiKey={apiKey}
       />
     </div>
   );
