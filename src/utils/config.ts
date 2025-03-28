@@ -13,4 +13,5 @@ export const STORAGE_KEYS = {
   CHATS: "bk_spiritual_chat_histories",
   CURRENT_CHAT: "bk_spiritual_current_chat",
   USER_CONTEXT: "bk_spiritual_user_context",
+  API_KEY: "bk_spiritual_dify_api_key",
 }

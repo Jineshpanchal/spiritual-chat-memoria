@@ -63,3 +63,21 @@ export function updateUserContext(updates: Partial<UserContext>): UserContext {
   saveUserContext(updatedContext);
   return updatedContext;
 }
+
+// API Key Storage
+export function saveDifyApiKey(apiKey: string): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
+  } catch (error) {
+    console.error("Error saving Dify API key to localStorage:", error);
+  }
+}
+
+export function getDifyApiKey(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.API_KEY);
+  } catch (error) {
+    console.error("Error getting Dify API key from localStorage:", error);
+    return null;
+  }
+}
