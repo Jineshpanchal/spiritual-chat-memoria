@@ -1,6 +1,6 @@
 
 import { ChatHistory, Message, UserContext } from "@/types/chat";
-import { STORAGE_KEYS } from "./config";
+import { STORAGE_KEYS, DIFY_CONFIG } from "./config";
 
 // Chat History Storage
 export function saveChats(chats: ChatHistory[]): void {
@@ -68,6 +68,8 @@ export function updateUserContext(updates: Partial<UserContext>): UserContext {
 export function saveDifyApiKey(apiKey: string): void {
   try {
     localStorage.setItem(STORAGE_KEYS.API_KEY, apiKey);
+    // Update the config
+    DIFY_CONFIG.API_KEY = apiKey;
   } catch (error) {
     console.error("Error saving Dify API key to localStorage:", error);
   }
@@ -75,9 +77,39 @@ export function saveDifyApiKey(apiKey: string): void {
 
 export function getDifyApiKey(): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEYS.API_KEY);
+    const apiKey = localStorage.getItem(STORAGE_KEYS.API_KEY);
+    // Update the config
+    if (apiKey) {
+      DIFY_CONFIG.API_KEY = apiKey;
+    }
+    return apiKey;
   } catch (error) {
     console.error("Error getting Dify API key from localStorage:", error);
+    return null;
+  }
+}
+
+// API Base URL Storage
+export function saveDifyApiBaseUrl(baseUrl: string): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.API_BASE_URL, baseUrl);
+    // Update the config
+    DIFY_CONFIG.API_BASE_URL = baseUrl;
+  } catch (error) {
+    console.error("Error saving Dify API base URL to localStorage:", error);
+  }
+}
+
+export function getDifyApiBaseUrl(): string | null {
+  try {
+    const baseUrl = localStorage.getItem(STORAGE_KEYS.API_BASE_URL);
+    // Update the config
+    if (baseUrl) {
+      DIFY_CONFIG.API_BASE_URL = baseUrl;
+    }
+    return baseUrl;
+  } catch (error) {
+    console.error("Error getting Dify API base URL from localStorage:", error);
     return null;
   }
 }

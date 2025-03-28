@@ -4,8 +4,14 @@
 
 export const DIFY_CONFIG = {
   // Default API key for public access - this would be replaced with an environment variable in production
-  API_KEY: "app-xuCbTKZQt2ASjXU6treUHu91", 
-  API_URL: "https://api.dify.ai/v1/chat-messages",
+  API_KEY: "", // Empty by default, will be provided by user
+  API_BASE_URL: "https://api.dify.ai/v1", // Default Dify API URL
+  API_PATH: "/chat-messages", // Endpoint path
+}
+
+// Get full API URL
+export const getDifyApiUrl = () => {
+  return `${DIFY_CONFIG.API_BASE_URL}${DIFY_CONFIG.API_PATH}`;
 }
 
 // Customize storage keys
@@ -14,4 +20,5 @@ export const STORAGE_KEYS = {
   CURRENT_CHAT: "bk_spiritual_current_chat",
   USER_CONTEXT: "bk_spiritual_user_context",
   API_KEY: "bk_spiritual_dify_api_key",
+  API_BASE_URL: "bk_spiritual_dify_api_base_url",
 }

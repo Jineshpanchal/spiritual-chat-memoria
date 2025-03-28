@@ -1,7 +1,8 @@
 
 import { DifyResponse, Message } from "@/types/chat";
 import { toast } from "sonner";
-import { DIFY_CONFIG } from "./config";
+import { DIFY_CONFIG, getDifyApiUrl } from "./config";
+import { getDifyApiKey, getDifyApiBaseUrl } from "./storage";
 
 export interface DifyApiConfig {
   conversationId?: string;
@@ -15,9 +16,25 @@ export async function sendMessageToDify(
   try {
     const { conversationId, userContext } = config;
     
-    console.log("Sending message to Dify API", { message, conversationId });
+    // Ensure we have the latest settings
+    getDifyApiKey();
+    getDifyApiBaseUrl();
     
-    const response = await fetch(DIFY_CONFIG.API_URL, {
+    // Get the full API URL
+    const apiUrl = getDifyApiUrl();
+    
+    console.log("Sending message to Dify API", { 
+      message, 
+      conversationId,
+      apiUrl
+    });
+    
+    if (!DIFY_CONFIG.API_KEY) {
+      toast.error("API key is missing. Please set your API key in settings.");
+      throw new Error("API key is required");
+    }
+    
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -38,10 +55,11 @@ export async function sendMessageToDify(
       
       // Handle unauthorized error more gracefully
       if (response.status === 401) {
-        toast.error("API authentication failed. Please contact the administrator.");
+        toast.error("API authentication failed. Please check your API key.");
         throw new Error("API authentication failed");
       }
       
+      toast.error(`Error: ${response.statusText}`);
       throw new Error(`Error connecting to Dify API: ${response.statusText}`);
     }
 
@@ -56,7 +74,9 @@ export async function sendMessageToDify(
     };
   } catch (error) {
     console.error("Error sending message to Dify:", error);
-    toast.error("Failed to get a response. Please try again.");
+    if (!(error instanceof Error) || !error.message.includes("API authentication failed")) {
+      toast.error("Failed to get a response. Please try again.");
+    }
     throw error;
   }
 }

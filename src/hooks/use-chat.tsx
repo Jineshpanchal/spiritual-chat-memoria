@@ -9,6 +9,8 @@ import {
   saveCurrentChatId,
   getUserContext,
   updateUserContext,
+  getDifyApiKey,
+  getDifyApiBaseUrl,
 } from "@/utils/storage";
 import {
   createNewChat,
@@ -29,6 +31,10 @@ export const useChat = () => {
     const storedChats = getChats();
     const storedCurrentChatId = getCurrentChatId();
     const storedUserContext = getUserContext();
+    
+    // Load API configuration
+    getDifyApiKey();
+    getDifyApiBaseUrl();
 
     setChatHistories(storedChats);
     setCurrentChatId(storedCurrentChatId);
