@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from "react";
 import { Message, ChatHistory } from "@/types/chat";
 import ChatMessage from "@/components/ChatMessage";
 import SuggestedQuestions from "@/components/SuggestedQuestions";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ChatContainerProps {
   currentChat: ChatHistory | null;
@@ -16,6 +17,7 @@ const ChatContainer = ({
   onSuggestedQuestionSelect 
 }: ChatContainerProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // Scroll to bottom of messages
   useEffect(() => {
@@ -27,7 +29,7 @@ const ChatContainer = ({
   if (!currentChat) return null;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 scrollbar-thin rounded-2xl bg-chat-gradient spiritual-shadow">
+    <div className={`flex-1 overflow-y-auto ${isMobile ? 'p-2' : 'p-4'} scrollbar-thin rounded-2xl bg-chat-gradient spiritual-shadow`}>
       {currentChat.messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center p-4">
           <p className="text-muted-foreground max-w-md mb-8">

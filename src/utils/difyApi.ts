@@ -35,6 +35,13 @@ export async function sendMessageToDify(
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Dify API error:", errorText);
+      
+      // Handle unauthorized error more gracefully
+      if (response.status === 401) {
+        toast.error("API authentication failed. Please contact the administrator.");
+        throw new Error("API authentication failed");
+      }
+      
       throw new Error(`Error connecting to Dify API: ${response.statusText}`);
     }
 
