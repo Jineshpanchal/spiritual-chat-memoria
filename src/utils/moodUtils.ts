@@ -21,17 +21,23 @@ export function getMoodEntries(): MoodEntry[] {
   }
 }
 
-// Add a new mood entry
-export function addMoodEntry(level: MoodLevel, notes: string, tags: string[] = []): MoodEntry {
+// Add a new mood entry or update existing one
+export function addMoodEntry(
+  level: MoodLevel, 
+  notes: string, 
+  tags: string[] = [],
+  customDate?: string
+): MoodEntry {
   const entries = getMoodEntries();
-  const today = new Date().toISOString().split('T')[0];
+  const entryDate = customDate || new Date().toISOString();
+  const datePrefix = entryDate.split('T')[0]; // YYYY-MM-DD
   
-  // Check if an entry already exists for today
-  const existingEntryIndex = entries.findIndex(entry => entry.date.startsWith(today));
+  // Check if an entry already exists for the selected date
+  const existingEntryIndex = entries.findIndex(entry => entry.date.startsWith(datePrefix));
   
   const newEntry: MoodEntry = {
     id: existingEntryIndex >= 0 ? entries[existingEntryIndex].id : crypto.randomUUID(),
-    date: new Date().toISOString(),
+    date: entryDate,
     level,
     notes,
     tags
@@ -168,6 +174,14 @@ export function getEntriesForPastDays(days: number): MoodEntry[] {
   
   return entries.filter(entry => new Date(entry.date) >= cutoffDate)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}
+
+// Get entry for specific date (if exists)
+export function getEntryForDate(date: Date): MoodEntry | null {
+  const entries = getMoodEntries();
+  const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  return entries.find(entry => entry.date.startsWith(dateStr)) || null;
 }
 
 // Format date for display

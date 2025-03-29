@@ -17,6 +17,7 @@ const MoodTracker = () => {
   const [entries, setEntries] = useState<MoodEntry[]>([]);
   const [activeTab, setActiveTab] = useState<string>("journal");
   const [timeRange, setTimeRange] = useState<number>(30);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const isMobile = useIsMobile();
   
   // Load mood entries from storage
@@ -35,6 +36,10 @@ const MoodTracker = () => {
   // Get mood summary
   const summary = getMoodSummary();
 
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 to-blue-50">
       <Navigation />
@@ -51,7 +56,11 @@ const MoodTracker = () => {
         <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} gap-4`}>
           {/* Left column - Entry form and summary */}
           <div className={`${isMobile ? '' : 'col-span-1'} space-y-4`}>
-            <MoodEntryForm onSave={loadEntries} />
+            <MoodEntryForm 
+              onSave={loadEntries} 
+              selectedDate={selectedDate}
+              onDateChange={handleDateChange}
+            />
             <MoodSummaryCard summary={summary} />
           </div>
           
@@ -95,7 +104,7 @@ const MoodTracker = () => {
               </div>
               
               <TabsContent value="journal" className="mt-0">
-                <MoodJournalEntries entries={entries} />
+                <MoodJournalEntries entries={entries} onEntrySelect={handleDateChange} />
               </TabsContent>
               
               <TabsContent value="chart" className="mt-0">

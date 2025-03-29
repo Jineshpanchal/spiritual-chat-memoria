@@ -3,13 +3,15 @@ import React from "react";
 import { MoodEntry, MoodLevel } from "@/types/mood";
 import { formatDate, getMoodLabel, getMoodColor } from "@/utils/moodUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, Star, Calendar } from "lucide-react";
+import { MessageSquare, Star, Calendar, Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface MoodJournalEntriesProps {
   entries: MoodEntry[];
+  onEntrySelect: (date: Date) => void;
 }
 
-const MoodJournalEntries = ({ entries }: MoodJournalEntriesProps) => {
+const MoodJournalEntries = ({ entries, onEntrySelect }: MoodJournalEntriesProps) => {
   if (entries.length === 0) {
     return (
       <Card className="bg-muted/50">
@@ -43,12 +45,23 @@ const MoodJournalEntries = ({ entries }: MoodJournalEntriesProps) => {
                 <CardTitle className="text-base font-medium">
                   {formatDate(entry.date)}
                 </CardTitle>
-                <div 
-                  className="flex items-center gap-1 px-2 py-1 rounded-full text-xs"
-                  style={{ backgroundColor: `${getMoodColor(entry.level)}20`, color: getMoodColor(entry.level) }}
-                >
-                  <Star className="h-3 w-3" />
-                  <span>{getMoodLabel(entry.level)}</span>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs"
+                    style={{ backgroundColor: `${getMoodColor(entry.level)}20`, color: getMoodColor(entry.level) }}
+                  >
+                    <Star className="h-3 w-3" />
+                    <span>{getMoodLabel(entry.level)}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => onEntrySelect(new Date(entry.date))}
+                    title="Edit entry"
+                  >
+                    <Edit className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
