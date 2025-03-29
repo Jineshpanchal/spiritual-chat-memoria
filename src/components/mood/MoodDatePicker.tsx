@@ -29,6 +29,17 @@ const MoodDatePicker = ({ selectedDate, onDateChange }: MoodDatePickerProps) => 
     );
   };
 
+  // Check if a date is today
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
+
+  // Disable future dates
+  const disabledDays = { after: new Date() };
+
   return (
     <div className="flex flex-col">
       <Popover>
@@ -37,10 +48,10 @@ const MoodDatePicker = ({ selectedDate, onDateChange }: MoodDatePickerProps) => 
             variant="outline"
             className={cn(
               "w-full justify-start text-left font-normal",
-              "border border-input"
+              "border border-input bg-spiritual-softGray/20 hover:bg-spiritual-softGray/30"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
             {format(selectedDate, "PPP")}
           </Button>
         </PopoverTrigger>
@@ -50,19 +61,22 @@ const MoodDatePicker = ({ selectedDate, onDateChange }: MoodDatePickerProps) => 
             selected={selectedDate}
             onSelect={(date) => date && onDateChange(date)}
             initialFocus
-            className={cn("p-3 pointer-events-auto")}
+            disabled={disabledDays}
+            className={cn("p-3 pointer-events-auto bg-white")}
             modifiers={{
               hasEntry: datesWithEntries,
+              today: [new Date()]
             }}
             modifiersClassNames={{
-              hasEntry: "bg-primary/20 text-primary font-medium",
+              hasEntry: "bg-primary/10 font-medium",
+              today: "bg-spiritual-softBlue text-primary font-bold"
             }}
             components={{
               DayContent: ({ date }) => (
-                <div className="relative">
+                <div className="relative flex items-center justify-center w-full h-full">
                   <div>{date.getDate()}</div>
                   {hasEntry(date) && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full"></div>
                   )}
                 </div>
               ),
