@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import MoodDatePicker from "./MoodDatePicker";
+import { AlertCircle, Calendar, Edit } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface MoodEntryFormProps {
   onSave: () => void;
@@ -52,6 +54,13 @@ const MoodEntryForm = ({ onSave, selectedDate, onDateChange }: MoodEntryFormProp
       date.getFullYear() === today.getFullYear();
   };
 
+  // Check if the selected date is in the future
+  const isFutureDate = (date: Date): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -82,10 +91,27 @@ const MoodEntryForm = ({ onSave, selectedDate, onDateChange }: MoodEntryFormProp
     }
   };
 
+  // Determine if the form should be readonly
+  const isReadOnly = !isToday(selectedDate);
+  
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{isToday(selectedDate) ? "Today's" : "Edit"} Spiritual Journey</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle>
+            {isToday(selectedDate) 
+              ? "Today's Spiritual Journey" 
+              : isFutureDate(selectedDate)
+                ? "Future Date"
+                : "Past Reflection"}
+          </CardTitle>
+          {currentEntry && !isToday(selectedDate) && (
+            <div className="flex items-center text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3 mr-1" />
+              {new Date(currentEntry.date).toLocaleDateString()}
+            </div>
+          )}
+        </div>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
@@ -94,30 +120,97 @@ const MoodEntryForm = ({ onSave, selectedDate, onDateChange }: MoodEntryFormProp
             onDateChange={onDateChange}
           />
           
-          <MoodSelector 
-            selectedMood={selectedMood} 
-            onChange={setSelectedMood} 
-          />
-          
-          <div>
-            <h3 className="text-lg font-medium mb-2">Reflections</h3>
-            <Textarea
-              placeholder="Share your thoughts, reflections, or spiritual insights from today..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[120px]"
-            />
-          </div>
+          {isFutureDate(selectedDate) ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You cannot create entries for future dates.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <>
+              <MoodSelector 
+                selectedMood={selectedMood} 
+                onChange={setSelectedMood}
+                readOnly={isReadOnly}
+              />
+              
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-medium">Reflections</h3>
+                  {isReadOnly && currentEntry && (
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <Edit className="h-3 w-3 mr-1" />
+                      View only
+                    </div>
+                  )}
+                </div>
+                <Textarea
+                  placeholder={isReadOnly 
+                    ? "You can only view past reflections" 
+                    : "Share your thoughts, reflections, or spiritual insights from today..."}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="min-h-[120px]"
+                  readOnly={isReadOnly}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
         
         <CardFooter>
-          <Button 
-            type="submit" 
-            disabled={isSubmitting || selectedMood === null}
-            className="w-full"
-          >
-            {isSubmitting ? "Saving..." : isEditing ? "Update Journal Entry" : "Save Journal Entry"}
-          </Button>
+          {isToday(selectedDate) && !isFutureDate(selectedDate) && (
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || selectedMood === null}
+              className="w-full"
+            >
+              {isSubmitting ? "Saving..." : isEditing ? "Update Journal Entry" : "Save Journal Entry"}
+            </Button>
+          )}
+          {!isToday(selectedDate) && !isFutureDate(selectedDate) && currentEntry && (
+            <Button 
+              type="button" 
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                const today = new Date();
+                onDateChange(today);
+                toast.info("Switched to today for editing");
+              }}
+            >
+              Switch to Today to Create Entry
+            </Button>
+          )}
+          {!isToday(selectedDate) && !isFutureDate(selectedDate) && !currentEntry && (
+            <Button 
+              type="button" 
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                const today = new Date();
+                onDateChange(today);
+                toast.info("Switched to today for creating a new entry");
+              }}
+            >
+              Switch to Today to Create Entry
+            </Button>
+          )}
+          {isFutureDate(selectedDate) && (
+            <Button 
+              type="button" 
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                const today = new Date();
+                onDateChange(today);
+                toast.info("Switched to today");
+              }}
+            >
+              Switch to Today's Date
+            </Button>
+          )}
         </CardFooter>
       </form>
     </Card>

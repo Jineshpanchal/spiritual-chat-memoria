@@ -30,14 +30,22 @@ const MoodDatePicker = ({ selectedDate, onDateChange }: MoodDatePickerProps) => 
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col space-y-2">
+      <div className="flex items-center justify-between">
+        <h3 className="text-md font-medium">Select Date</h3>
+        <span className="text-xs text-muted-foreground">
+          {hasEntry(selectedDate) ? "Entry exists" : "No entry"}
+        </span>
+      </div>
+      
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             className={cn(
               "w-full justify-start text-left font-normal",
-              "border border-input"
+              "border border-input",
+              hasEntry(selectedDate) && "bg-primary/10"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
