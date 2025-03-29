@@ -21,4 +21,5 @@ export const STORAGE_KEYS = {
   USER_CONTEXT: "bk_spiritual_user_context",
   API_KEY: "bk_spiritual_dify_api_key",
   API_BASE_URL: "bk_spiritual_dify_api_base_url",
+  MOOD_ENTRIES: "bk_spiritual_mood_entries",
 }

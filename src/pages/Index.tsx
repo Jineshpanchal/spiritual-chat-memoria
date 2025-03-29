@@ -5,6 +5,7 @@ import ChatHeader from "@/components/ChatHeader";
 import EmptyState from "@/components/EmptyState";
 import ChatHistorySidebar from "@/components/ChatHistorySidebar";
 import ChatContainer from "@/components/ChatContainer";
+import Navigation from "@/components/Navigation";
 import { useChat } from "@/hooks/use-chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -24,6 +25,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 to-blue-50">
+      <Navigation />
+      
       <div className={`container max-w-4xl flex-1 ${isMobile ? 'px-2 py-2' : 'py-4'} flex flex-col`}>
         <ChatHeader
           currentChat={currentChat}
