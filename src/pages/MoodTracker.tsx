@@ -12,7 +12,6 @@ import MoodAnalyticsInfo from "@/components/mood/MoodAnalyticsInfo";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar } from "lucide-react";
 
 const MoodTracker = () => {
   const [entries, setEntries] = useState<MoodEntry[]>([]);
@@ -41,30 +40,13 @@ const MoodTracker = () => {
     setSelectedDate(date);
   };
 
-  // Check if the selected date has an entry
-  const hasEntryForSelectedDate = entries.some(entry => {
-    const entryDate = new Date(entry.date);
-    const selected = new Date(selectedDate);
-    return (
-      entryDate.getFullYear() === selected.getFullYear() &&
-      entryDate.getMonth() === selected.getMonth() &&
-      entryDate.getDate() === selected.getDate()
-    );
-  });
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 to-blue-50">
       <Navigation />
       
       <div className={`container max-w-4xl flex-1 ${isMobile ? 'px-2 py-2' : 'py-4'} flex flex-col gap-4`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold">Spiritual Mood Tracker</h1>
-            <div className="ml-2 px-2 py-1 bg-purple-100 rounded-full text-xs font-medium text-purple-800 flex items-center">
-              <Calendar className="h-3 w-3 mr-1" />
-              {hasEntryForSelectedDate ? "Entry Exists" : "No Entry"}
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold">Spiritual Mood Tracker</h1>
           <div className="flex items-center gap-2">
             <ExportDataButton />
             <MoodAnalyticsInfo />
@@ -122,21 +104,12 @@ const MoodTracker = () => {
               </div>
               
               <TabsContent value="journal" className="mt-0">
-                <MoodJournalEntries 
-                  entries={entries} 
-                  onEntrySelect={handleDateChange} 
-                  selectedDate={selectedDate}
-                />
+                <MoodJournalEntries entries={entries} onEntrySelect={handleDateChange} />
               </TabsContent>
               
               <TabsContent value="chart" className="mt-0">
                 <div className="bg-card rounded-lg p-4 border">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold">Mood History</h2>
-                    <div className="text-xs text-muted-foreground">
-                      {entries.length} total entries
-                    </div>
-                  </div>
+                  <h2 className="text-xl font-semibold mb-4">Mood History</h2>
                   <MoodChart entries={chartEntries} days={timeRange} />
                 </div>
               </TabsContent>
