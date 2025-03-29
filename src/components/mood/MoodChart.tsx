@@ -25,11 +25,41 @@ interface MoodChartProps {
 
 const MoodChart = ({ entries, days = 30 }: MoodChartProps) => {
   const chartConfig = {
-    very_low: { label: "Very Low", theme: { light: "#ef4444" } },
-    low: { label: "Low", theme: { light: "#f97316" } },
-    neutral: { label: "Neutral", theme: { light: "#eab308" } },
-    good: { label: "Good", theme: { light: "#84cc16" } },
-    excellent: { label: "Excellent", theme: { light: "#22c55e" } },
+    very_low: { 
+      label: "Very Low", 
+      theme: { 
+        light: "#ef4444",
+        dark: "#ef4444" 
+      } 
+    },
+    low: { 
+      label: "Low", 
+      theme: { 
+        light: "#f97316",
+        dark: "#f97316" 
+      } 
+    },
+    neutral: { 
+      label: "Neutral", 
+      theme: { 
+        light: "#eab308",
+        dark: "#eab308" 
+      } 
+    },
+    good: { 
+      label: "Good", 
+      theme: { 
+        light: "#84cc16",
+        dark: "#84cc16" 
+      } 
+    },
+    excellent: { 
+      label: "Excellent", 
+      theme: { 
+        light: "#22c55e",
+        dark: "#22c55e" 
+      } 
+    },
   };
 
   // Create an array of the last 'days' days

@@ -1,5 +1,4 @@
-
-import { MoodEntry, MoodLevel, MoodSummary } from "@/types/mood";
+import { MoodEntry, MoodLevel, MoodSummary, MoodAnalytics } from "@/types/mood";
 import { STORAGE_KEYS } from "./config";
 
 // Save mood entries to localStorage
@@ -98,7 +97,39 @@ export function calculateImprovementRate(entries: MoodEntry[]): number {
   return previousAvg !== 0 ? ((recentAvg - previousAvg) / previousAvg) * 100 : 0;
 }
 
-// Get mood summary statistics
+// Calculate standard deviation (variability) of mood levels
+export function calculateVariability(entries: MoodEntry[]): number {
+  if (entries.length <= 1) return 0;
+  
+  const levels = entries.map(entry => entry.level);
+  const mean = levels.reduce((sum, level) => sum + level, 0) / levels.length;
+  
+  const squaredDifferences = levels.map(level => Math.pow(level - mean, 2));
+  const variance = squaredDifferences.reduce((sum, diff) => sum + diff, 0) / (levels.length - 1);
+  
+  return Math.sqrt(variance);
+}
+
+// Calculate habit consistency (percentage of days with entries in the last month)
+export function calculateHabitConsistency(entries: MoodEntry[]): number {
+  if (entries.length === 0) return 0;
+  
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  
+  const uniqueDaysWithEntries = new Set();
+  entries.forEach(entry => {
+    const entryDate = new Date(entry.date);
+    if (entryDate >= thirtyDaysAgo && entryDate <= today) {
+      uniqueDaysWithEntries.add(entryDate.toISOString().split('T')[0]);
+    }
+  });
+  
+  return (uniqueDaysWithEntries.size / 30) * 100;
+}
+
+// Get mood summary statistics with enhanced metrics
 export function getMoodSummary(): MoodSummary {
   const entries = getMoodEntries();
   
@@ -107,19 +138,25 @@ export function getMoodSummary(): MoodSummary {
       averageLevel: 0,
       totalEntries: 0,
       streakDays: 0,
-      improvementRate: 0
+      improvementRate: 0,
+      variabilityScore: 0,
+      habitConsistency: 0
     };
   }
   
   const averageLevel = entries.reduce((sum, entry) => sum + entry.level, 0) / entries.length;
   const streakDays = calculateStreak(entries);
   const improvementRate = calculateImprovementRate(entries);
+  const variabilityScore = calculateVariability(entries);
+  const habitConsistency = calculateHabitConsistency(entries);
   
   return {
     averageLevel,
     totalEntries: entries.length,
     streakDays,
-    improvementRate
+    improvementRate,
+    variabilityScore,
+    habitConsistency
   };
 }
 
@@ -165,4 +202,35 @@ export function getMoodColor(level: MoodLevel): string {
     case 5: return "#22c55e"; // green-500
     default: return "#94a3b8"; // slate-400
   }
+}
+
+// Get information about mood scoring methodology
+export function getMoodAnalyticsInfo(): MoodAnalytics[] {
+  return [
+    {
+      title: "Average Mood Level",
+      description: "The arithmetic mean of all your mood entries, giving an overall picture of your emotional state.",
+      methodology: "Calculated by summing all mood levels and dividing by the number of entries."
+    },
+    {
+      title: "Streak Days",
+      description: "The number of consecutive days you've tracked your mood without missing a day.",
+      methodology: "Based on the Seinfeld 'Don't Break the Chain' method, which is proven to build lasting habits through consistency."
+    },
+    {
+      title: "Improvement Rate",
+      description: "How your mood is trending compared to the previous period.",
+      methodology: "Calculated using a rolling average comparison between the most recent 7 days and the 7 days before that, expressed as a percentage change."
+    },
+    {
+      title: "Variability Score",
+      description: "How much your mood fluctuates day to day.",
+      methodology: "Calculated using standard deviation, a statistical measure that quantifies the amount of variation in your mood levels."
+    },
+    {
+      title: "Habit Consistency",
+      description: "How consistently you're tracking your mood.",
+      methodology: "Percentage of days in the last 30 days that have a mood entry, based on the habit formation research by BJ Fogg which shows that consistency is more important than intensity in forming lasting habits."
+    }
+  ];
 }

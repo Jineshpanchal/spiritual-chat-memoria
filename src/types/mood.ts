@@ -14,4 +14,12 @@ export interface MoodSummary {
   totalEntries: number;
   streakDays: number;
   improvementRate: number;
+  variabilityScore?: number; // Standard deviation of mood levels
+  habitConsistency?: number; // Percentage of days with entries
+}
+
+export interface MoodAnalytics {
+  title: string;
+  description: string;
+  methodology: string;
 }

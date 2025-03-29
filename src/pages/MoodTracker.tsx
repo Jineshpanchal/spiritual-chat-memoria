@@ -7,6 +7,8 @@ import MoodEntryForm from "@/components/mood/MoodEntryForm";
 import MoodSummaryCard from "@/components/mood/MoodSummaryCard";
 import MoodChart from "@/components/mood/MoodChart";
 import MoodJournalEntries from "@/components/mood/MoodJournalEntries";
+import ExportDataButton from "@/components/mood/ExportDataButton";
+import MoodAnalyticsInfo from "@/components/mood/MoodAnalyticsInfo";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,7 +40,13 @@ const MoodTracker = () => {
       <Navigation />
       
       <div className={`container max-w-4xl flex-1 ${isMobile ? 'px-2 py-2' : 'py-4'} flex flex-col gap-4`}>
-        <h1 className="text-2xl font-bold">Spiritual Mood Tracker</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Spiritual Mood Tracker</h1>
+          <div className="flex items-center gap-2">
+            <ExportDataButton />
+            <MoodAnalyticsInfo />
+          </div>
+        </div>
         
         <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} gap-4`}>
           {/* Left column - Entry form and summary */}

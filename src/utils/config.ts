@@ -22,4 +22,14 @@ export const STORAGE_KEYS = {
   API_KEY: "bk_spiritual_dify_api_key",
   API_BASE_URL: "bk_spiritual_dify_api_base_url",
   MOOD_ENTRIES: "bk_spiritual_mood_entries",
+  EXPORTED_DATA: "bk_spiritual_exported_data",
 }
+
+// Storage mechanism - currently using localStorage
+// This could be extended to use IndexedDB for larger storage needs
+export const STORAGE_TYPE = {
+  LOCAL_STORAGE: "localStorage",
+  INDEXED_DB: "indexedDB",
+}
+
+export const CURRENT_STORAGE = STORAGE_TYPE.LOCAL_STORAGE;
